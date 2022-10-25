@@ -6,22 +6,30 @@
 
 using namespace std;
 
-class BiseccionSolveFunctions{
-
+class BisectionSolveFunction{
 public:
-    float get_trigo_result(string type_function, string ecuation, int intervalo, int _pow) {
+    float get_solved_function(string type_function, string ecuation, int interval, int _pow) {
         float result;
+        bool flag = false;
         if (ecuation == ""){
             ecuation = "1";
         }
+        if (ecuation.find("-") != string::npos){
+
+            flag = true;
+            ecuation.replace(ecuation.find("-"), 1, "");
+        }
         if (type_function == "") {
-            result = pow(stoi(ecuation) * intervalo, _pow);
+            result = pow(stoi(ecuation) * interval, _pow);
         } else if (type_function == "cos") {
-            result = pow(cos(stoi(ecuation) * intervalo), _pow);
+            result = pow(cos(stoi(ecuation) * interval), _pow);
         } else if (type_function == "sen") {
-            result = pow(sin(stoi(ecuation) * intervalo), _pow);
+            result = pow(sin(stoi(ecuation) * interval), _pow);
         } else if (type_function == "tan") {
-            result = pow(tan(stoi(ecuation) * intervalo), _pow);
+            result = pow(tan(stoi(ecuation) * interval), _pow);
+        }
+        if (flag){
+            return result * -1;
         }
         return result;
     }
@@ -29,8 +37,18 @@ public:
     string reduce_ecuation(string ecuation, string type_ecuation = "") {
         string copy_ecuacion;
         copy_ecuacion = ecuation;
+        bool flag = false;
+        if (ecuation.find("-") != string::npos){
+            flag = true;
+        }
         if (type_ecuation != "") {
-            copy_ecuacion.replace(copy_ecuacion.find(type_ecuation),copy_ecuacion.find("(") + 1, "");
+            int _finder;
+            if (flag) {
+                _finder = copy_ecuacion.find("(");
+            } else {
+                _finder = copy_ecuacion.find("(") + 1;
+            }
+            copy_ecuacion.replace(copy_ecuacion.find(type_ecuation),_finder, "");
             copy_ecuacion.replace(copy_ecuacion.find(")"), 1, "");
         }
         if (copy_ecuacion.find("x") != string::npos){
@@ -47,7 +65,7 @@ public:
                 merged_result[it2->first] += it2->second;
             }
         }
-        return merged_result
+        return merged_result;
     }
 
 };
@@ -55,39 +73,33 @@ public:
 
 class Biseccion{
 private:
-    int grado;
-    string *ecuacion;
-    int *intervalo, intervalo1, intervalo2;
+    int grade, interval1, interval2, *interval;
+    string *ecuation;
 public:
-    BiseccionSolveFunctions solve = *new BiseccionSolveFunctions();
+    BisectionSolveFunction solve = *new BisectionSolveFunction();
     void setGrado() {
         cout << "Introduce el grado del polinomio:" << endl;
-        cin >> grado;
+        cin >> grade;
     }
 
     void setIntervalo() {
         int longitud = 0;
         cout << "Introduce el principio del intervalo: " << endl;
-        cin >> intervalo1;
+        cin >> interval1;
         cout << "Introduce el final del intervalo: " << endl;
-        cin >> intervalo2;
-        for (int i = intervalo1; i <= intervalo2; i++){
-            longitud++;
-        }
-        intervalo = new int[longitud];
-        for (int i = intervalo1; i <= intervalo2; i++){
-            intervalo[i] = i;
-        }
+        cin >> interval2;
+        int inter[2] = {interval1, interval2};
+        interval = inter;
     }
 
     void generar_ecuacion(){
-        ecuacion = new string[grado + 1];
+        ecuation = new string[grade + 1];
     }
 
     void fillEcuacion(){
-        for (int i = 0; i < grado + 1; i++) {
+        for (int i = 0; i < grade + 1; i++) {
             cout << "Introduce el elemento " << i + 1 << " de la ecuacion" << endl;
-            cin >> ecuacion[i];
+            cin >> ecuation[i];
         }
     }
 
@@ -96,27 +108,26 @@ public:
         map<string, map<string, float>> results;
         map<string, float> merged_result;
         float result;
-        for (int i = 0; i <= grado; i++) {
+        for (int i = 0; i < grade + 1; i++) {
             try{
-                result = stof(ecuacion[i]);
-                for (int k = intervalo1; k <= intervalo2; k++){
-                    results[to_string(grado)][to_string(intervalo[k])] = result;
+                result = stof(ecuation[i]);
+                for (int i = 0; i < sizeof(interval)/sizeof(interval[0]); i++){
+                    results[to_string(grade)][to_string(interval[i])] = result;
                 }
             } catch (const std::invalid_argument) {
                 float result;
-                for (int j = 0; j < 5; j++){
+                for (int j = 0; j < 3; j++){
                     string type_ecuation;
-                    for (int k = intervalo1; k <= intervalo2; k++) {
-                        if (ecuacion[i].find(cases[j]) != string::npos) {
+                    for (int k = 0; k < sizeof(interval)/sizeof(interval[0]); k++) {
+                        if (ecuation[i].find(cases[j]) != string::npos) {
                             type_ecuation = cases[j];
-
-                        } else if (!(ecuacion[i].find(cases[j]) != string::npos) and ecuacion[i].find("x") != string::npos) {
+                        } else if (!(ecuation[i].find(cases[j]) != string::npos) and ecuation[i].find("x") != string::npos) {
                             type_ecuation = "";
                         }
-                        string new_ecuation = solve.reduce_ecuation(ecuacion[i], type_ecuation);
+                        string new_ecuation = solve.reduce_ecuation(ecuation[i], type_ecuation);
                         try {
-                            result = solve.get_trigo_result(type_ecuation,new_ecuation,intervalo[k],i);
-                            results[to_string(grado)][to_string(intervalo[k])] = result;
+                            result = solve.get_solved_function(type_ecuation,new_ecuation,interval[k],i);
+                            results[to_string(grade)][to_string(interval[k])] = result;
                         } catch (std::invalid_argument) {
                             //
                         }
