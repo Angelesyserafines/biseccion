@@ -205,11 +205,11 @@ public:
                     second_result = (it2->second)/2;
                 }
             }
-            float efe_de_equis = first_result * second_result;
+            float fx = first_result * second_result;
             //cout << "el primero es " << first_result << " el segundo es " << second_result << endl;
             while (error > pow(10, -5)){
                 float last_iteration = iteration;
-                if (efe_de_equis > 0){
+                if (fx > 0){
                     inter[0] = iteration;
                 } else {
                     inter[1] = iteration;
@@ -237,7 +237,7 @@ public:
                 }
                 //cout << "el segundo el primero es " << first_result << " el segundo es " << second_result << endl;
                 error = (iteration - last_iteration)/iteration;
-                efe_de_equis = first_result * second_result;
+                fx = first_result * second_result;
                 if (error < 0) {
                     error = error * -1;
                 }
