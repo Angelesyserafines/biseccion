@@ -201,7 +201,7 @@ public:
             float to_iterate[1] = {iteration};
             result = ecu.sustituir(to_iterate);
             for (map<string, float>::iterator it2 = result.begin(); it2 != result.end(); ++it2){
-                if (second_result == 0) {
+                if (second_result == 0 and it2->first == to_string(to_iterate[0])) {
                     second_result = (it2->second)/2;
                 }
             }
